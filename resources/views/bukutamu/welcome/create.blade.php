@@ -163,7 +163,7 @@
 
             <h1
                 class="title-enter text-center text-2xl md:text-3xl font-extrabold text-gray-900 pb-3 mb-6 border-b-2 border-yellow-500">
-                BUKU TAMU ELEKTRONIK
+                BUKU TAMU ELEKTRONIK BISIMILLAH
             </h1>
 
             <form action="{{ route('bukutamu.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4" id="bukuTamuForm">
