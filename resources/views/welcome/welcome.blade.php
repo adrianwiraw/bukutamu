@@ -1557,10 +1557,10 @@
                 Elektronik kami.
             </p>
 
-            <button
-                class="bg-linear-to-t from-yellow-400 to-yellow-300 text-yellow-900 p-2 px-4 md:p-4 md:px-8 text-xl md:text-3xl ml-6 rounded-md font-extrabold border-[1.5px] border-yellow-500 shadow-[0_2.5px_0_#ca8a04] hover:bg-yellow-400 cursor-pointer active:scale-98 hover:scale-105 duration-200 transition-all ease-in-out animate-slide-in-bottom">
-                <a href="/bukutamu">Mulai</a>
-            </button>
+            <a href="{{ route('bukutamu.create') }}"
+                class="inline-block bg-linear-to-t from-yellow-400 to-yellow-300 text-yellow-900 p-2 px-4 md:p-4 md:px-8 text-xl md:text-3xl ml-6 rounded-md font-extrabold border-[1.5px] border-yellow-500 shadow-[0_2.5px_0_#ca8a04] hover:bg-yellow-400 active:scale-98 hover:scale-105 duration-200 transition-all ease-in-out animate-slide-in-bottom text-center">
+                Mulai
+            </a>
         </section>
 
         <section class="max-h-screen hidden lg:block w-full bg-slate-100 p-8 animate-fade-in">

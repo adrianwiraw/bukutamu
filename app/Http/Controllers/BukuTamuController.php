@@ -46,6 +46,7 @@ class BukuTamuController extends Controller
 
         return redirect()->route('bukutamu.create')
             ->with('success', 'Terima kasih, data berhasil disimpan!')
+            ->with('showFeedbackModal', true)
             ->with('latest_buku_tamu_id', $bukuTamu->id);
     }
 
@@ -54,7 +55,7 @@ class BukuTamuController extends Controller
         $bukuTamuId = $request->input('latest_buku_tamu_id') ?? $request->session()->get('latest_buku_tamu_id');
 
         if (! $bukuTamuId) {
-            return redirect()->route('welcome')->with('feedback_error', 'Sesi feedback tidak tersedia.');
+            return redirect()->route('bukutamu.create')->with('feedback_error', 'Sesi feedback tidak tersedia.');
         }
 
         $validated = $request->validate([
@@ -74,7 +75,7 @@ class BukuTamuController extends Controller
             ]);
         }
 
-        return redirect()->route('welcome')
+        return redirect()->route('bukutamu.create')
             ->with('feedback_success', 'Terima kasih atas feedback Anda.');
     }
 }

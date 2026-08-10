@@ -122,6 +122,12 @@
             background: #3f3f46;
             color: #f4f4f5;
         }
+
+        /* Tombol keyboard yang dinonaktifkan saat field numerik aktif */
+        #customKeyboard .kb-key.kb-disabled {
+            opacity: 0.35;
+            pointer-events: none;
+        }
     </style>
 </head>
 
@@ -171,8 +177,9 @@
                             IDENTITAS <span class="font-normal italic text-red-600">(Wajib Diisi)</span>
                         </label>
                         <input type="text" name="identitas" required inputmode="none"
+                            pattern="[0-9]*" maxlength="20"
                             placeholder="Kartu Tanda Penduduk / SIM / Kartu Pelajar"
-                            class="kb-input w-full border border-gray-300 rounded-lg px-4 p-2 text-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                            class="kb-input kb-input-numeric w-full border border-gray-300 rounded-lg px-4 p-2 text-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
                     </div>
 
                     <!-- NOMOR HP -->
@@ -181,8 +188,10 @@
                             NOMOR HP <span class="font-normal italic text-red-600">(Data akan kami jaga
                                 kerahasiaannya)</span>
                         </label>
-                        <input type="text" name="no_hp" inputmode="none" placeholder="Nomor yang bisa dihubungi"
-                            class="kb-input w-full border border-gray-300 rounded-lg px-4 p-2 text-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                        <input type="text" name="no_hp" inputmode="none"
+                            pattern="[0-9]*" maxlength="15"
+                            placeholder="Nomor yang bisa dihubungi"
+                            class="kb-input kb-input-numeric w-full border border-gray-300 rounded-lg px-4 p-2 text-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
                     </div>
 
                     <!-- INSTANSI / ALAMAT -->
@@ -265,8 +274,10 @@
                         <label class="block text-x font-semibold text-gray-600 mb-1 p-2 px-4">
                             USIA <span class="font-normal italic text-red-600">(Wajib Diisi)</span>
                         </label>
-                        <input type="text" name="usia" required inputmode="none" placeholder="Usia Anda"
-                            class="kb-input w-full border border-gray-300 rounded-lg px-4 p-2 text-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                        <input type="text" name="usia" required inputmode="none"
+                            pattern="[0-9]*" maxlength="3"
+                            placeholder="Usia Anda"
+                            class="kb-input kb-input-numeric w-full border border-gray-300 rounded-lg px-4 p-2 text-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
                     </div>
 
                     <!-- SEBUTKAN JUMLAHNYA (muncul kalau Rombongan) -->
@@ -276,8 +287,9 @@
                                 Diisi)</span>
                         </label>
                         <input type="text" name="jumlah_rombongan" id="jumlah_rombongan" inputmode="none"
+                            pattern="[0-9]*" maxlength="3"
                             placeholder="Contoh: 5"
-                            class="kb-input w-full border border-gray-300 rounded-lg px-4 p-2 text-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                            class="kb-input kb-input-numeric w-full border border-gray-300 rounded-lg px-4 p-2 text-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
                     </div>
 
                 </div>
@@ -292,46 +304,39 @@
         </div>
     </div>
 
-    @if (session('success'))
-        <script>
-            window.addEventListener('DOMContentLoaded', () => {
-                document.getElementById('successModal').classList.remove('hidden');
-                document.getElementById('successModal').classList.add('flex');
-            });
-        </script>
-    @endif
-
-    <div id="successModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 px-4">
-        <div class="w-full max-w-md rounded-2xl border border-yellow-200 bg-white p-6 shadow-2xl">
-            <div class="flex items-center justify-center mb-4">
-                <div class="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-100 text-yellow-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
+    @if (session('showFeedbackModal'))
+        <div id="successModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 px-4">
+            <div class="w-full max-w-md rounded-2xl border border-yellow-200 bg-white p-6 shadow-2xl">
+                <div class="flex items-center justify-center mb-4">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-100 text-yellow-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
                 </div>
+                <h3 class="text-center text-xl font-bold text-gray-900">Terima kasih!</h3>
+                <p class="mt-2 text-center text-sm text-gray-600">Data buku tamu Anda berhasil tersimpan.</p>
+                <form action="{{ route('bukutamu.feedback.store') }}" method="POST" class="mt-4 space-y-3">
+                    @csrf
+                    <div class="flex items-center justify-center gap-2" id="feedbackStars">
+                        <button type="button" class="star-btn text-3xl text-gray-300 hover:text-yellow-500 transition" data-value="1">★</button>
+                        <button type="button" class="star-btn text-3xl text-gray-300 hover:text-yellow-500 transition" data-value="2">★</button>
+                        <button type="button" class="star-btn text-3xl text-gray-300 hover:text-yellow-500 transition" data-value="3">★</button>
+                        <button type="button" class="star-btn text-3xl text-gray-300 hover:text-yellow-500 transition" data-value="4">★</button>
+                        <button type="button" class="star-btn text-3xl text-gray-300 hover:text-yellow-500 transition" data-value="5">★</button>
+                    </div>
+                    <input type="hidden" name="feedback_rating" id="feedbackRating" value="">
+                    <input type="hidden" name="latest_buku_tamu_id" value="{{ session('latest_buku_tamu_id') }}">
+                    <textarea name="feedback_message" rows="3" placeholder="Berikan saran atau feedback singkat untuk kami..."
+                        class="kb-input w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500"></textarea>
+                    <div class="mt-6 flex justify-center gap-3">
+                        <button type="submit" class="rounded-lg bg-yellow-500 px-4 py-2 font-semibold text-gray-900 hover:bg-yellow-600">Kirim Feedback</button>
+                        <button type="button" id="closeSuccessModal" class="rounded-lg border border-gray-300 px-4 py-2 font-semibold text-gray-700 hover:bg-gray-100">Lewati</button>
+                    </div>
+                </form>
             </div>
-            <h3 class="text-center text-xl font-bold text-gray-900">Terima kasih!</h3>
-            <p class="mt-2 text-center text-sm text-gray-600">Data buku tamu Anda berhasil tersimpan.</p>
-            <form action="{{ route('bukutamu.feedback.store') }}" method="POST" class="mt-4 space-y-3">
-                @csrf
-                <div class="flex items-center justify-center gap-2" id="feedbackStars">
-                    <button type="button" class="star-btn text-3xl text-gray-300 hover:text-yellow-500 transition" data-value="1">★</button>
-                    <button type="button" class="star-btn text-3xl text-gray-300 hover:text-yellow-500 transition" data-value="2">★</button>
-                    <button type="button" class="star-btn text-3xl text-gray-300 hover:text-yellow-500 transition" data-value="3">★</button>
-                    <button type="button" class="star-btn text-3xl text-gray-300 hover:text-yellow-500 transition" data-value="4">★</button>
-                    <button type="button" class="star-btn text-3xl text-gray-300 hover:text-yellow-500 transition" data-value="5">★</button>
-                </div>
-                <input type="hidden" name="feedback_rating" id="feedbackRating" value="">
-                <input type="hidden" name="latest_buku_tamu_id" value="{{ session('latest_buku_tamu_id') }}">
-                <textarea name="feedback_message" rows="3" placeholder="Berikan saran atau feedback singkat untuk kami..."
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500"></textarea>
-                <div class="mt-6 flex justify-center gap-3">
-                    <button type="submit" class="rounded-lg bg-yellow-500 px-4 py-2 font-semibold text-gray-900 hover:bg-yellow-600">Kirim Feedback</button>
-                    <button type="button" id="closeSuccessModal" class="rounded-lg border border-gray-300 px-4 py-2 font-semibold text-gray-700 hover:bg-gray-100">Lewati</button>
-                </div>
-            </form>
         </div>
-    </div>
+    @endif
 
     @include('partials.footer')
 
@@ -362,6 +367,13 @@
                 }
             });
 
+            // Batasi hanya angka untuk field numerik (mengantisipasi keyboard fisik / paste)
+            document.querySelectorAll('.kb-input-numeric').forEach(input => {
+                input.addEventListener('input', function () {
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                });
+            });
+
             // Custom keyboard
             const kbBox = document.getElementById('customKeyboard');
             const kbKeys = document.getElementById('kbKeys');
@@ -379,8 +391,18 @@
                 ['space', 'enter']
             ];
 
+            function isNumericKey(key) {
+                return /^[0-9]$/.test(key);
+            }
+
+            function isLetterKey(key) {
+                return /^[a-z]$/i.test(key);
+            }
+
             function renderKeyboard() {
                 kbKeys.innerHTML = '';
+                const activeIsNumeric = activeInput && activeInput.classList.contains('kb-input-numeric');
+
                 rows.forEach(rowKeys => {
                     const rowEl = document.createElement('div');
                     rowEl.className = 'flex gap-1.5 w-full justify-center';
@@ -403,6 +425,11 @@
                         btn.dataset.key = key;
                         btn.className = `kb-key ${variant} ${extraClass} h-11`;
 
+                        // Nonaktifkan tombol huruf/shift/spasi kalau field aktif adalah numerik
+                        if (activeIsNumeric && (isLetterKey(key) || key === 'shift' || key === 'space')) {
+                            btn.classList.add('kb-disabled');
+                        }
+
                         btn.addEventListener('click', () => handleKey(key, btn));
                         rowEl.appendChild(btn);
                     });
@@ -422,6 +449,13 @@
 
             function handleKey(key, btn) {
                 if (!activeInput) return;
+
+                const isNumericField = activeInput.classList.contains('kb-input-numeric');
+
+                // Tolak huruf, shift, dan spasi kalau field numerik
+                if (isNumericField && (isLetterKey(key) || key === 'shift' || key === 'space')) {
+                    return;
+                }
 
                 btn.classList.add('kb-pressed');
                 setTimeout(() => btn.classList.remove('kb-pressed'), 100);
@@ -455,6 +489,7 @@
                     activeInput = input;
                     kbBox.classList.remove('hidden');
                     kbBox.classList.add('kb-show');
+                    renderKeyboard();
                     adjustFormPosition(input);
                 });
             });
@@ -484,19 +519,21 @@
                 }
             });
 
-            if (closeSuccessModal) {
-                closeSuccessModal.addEventListener('click', () => {
-                    successModal.classList.add('hidden');
-                    successModal.classList.remove('flex');
+            if (successModal) {
+                if (closeSuccessModal) {
+                    closeSuccessModal.addEventListener('click', () => {
+                        successModal.classList.add('hidden');
+                        successModal.classList.remove('flex');
+                    });
+                }
+
+                successModal.addEventListener('click', (event) => {
+                    if (event.target === successModal) {
+                        successModal.classList.add('hidden');
+                        successModal.classList.remove('flex');
+                    }
                 });
             }
-
-            successModal.addEventListener('click', (event) => {
-                if (event.target === successModal) {
-                    successModal.classList.add('hidden');
-                    successModal.classList.remove('flex');
-                }
-            });
 
             document.addEventListener('pointerdown', e => {
                 const isInput = e.target.classList.contains('kb-input');
