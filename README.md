@@ -1,77 +1,83 @@
-Instalasi
-1. Clone Repository
-bash
+# Buku Elektronik Tamu
+
+## Instalasi Docker
+
+1. Clone repository:
+
+```bash
 git clone <url-repo-ini>
 cd buku-elektronik-tamu
-2. Install Dependency PHP
-bash
-composer install
-3. Setup Environment
-bash
+```
+
+2. Salin file environment:
+
+```bash
 cp .env.example .env
-php artisan key:generate
+```
 
-Pastikan konfigurasi database di .env menggunakan SQLite:
+3. Pastikan konfigurasi database di `.env` menggunakan pengaturan berikut:
 
-env
-DB_CONNECTION=sqlite
-4. Buat File Database
-bash
-touch database/database.sqlite
+```env
+DB_CONNECTION=mysql
+DB_HOST=db
+DB_PORT=3306
+DB_DATABASE=buku_tamu
+DB_USERNAME=laravel
+DB_PASSWORD=secret
+```
 
-Windows (Command Prompt): type nul > database\database.sqlite
+4. Jalankan Docker Compose:
 
-5. Jalankan Migration
-bash
-php artisan migrate
-6. Buat Akun Admin
-bash
-php artisan tinker
+```bash
+docker compose up --build -d
+```
 
-Di dalam tinker:
+5. Jalankan migrasi database:
 
-php
+```bash
+docker compose exec app php artisan migrate
+```
+
+6. Buat akun admin (Opsional):
+
+```bash
+docker compose exec app php artisan tinker
+```
+
+Kemudian di dalam tinker:
+
+```php
 \App\Models\User::create([
     'name' => 'Admin',
     'email' => 'admin@arpusjateng.go.id',
     'password' => bcrypt('password123'),
 ]);
+```
 
-Ketik exit untuk keluar.
+Ketik `exit` untuk keluar dari tinker.
 
-7. Install Dependency JavaScript
-bash
-npm install
-8. Siapkan Gambar
+## Akses Aplikasi
 
-Pastikan folder public/images/ berisi:
+Setelah container berjalan, buka aplikasi di:
 
-darpus.jpg — foto gedung
-jateng.png — logo instansi
+- `http://127.0.0.1:8000`
+- `http://127.0.0.1:8000/buku-tamu`
+- `http://127.0.0.1:8000/login`
+- `http://127.0.0.1:8000/dashboard`
 
-Jika folder ini tidak ikut ter-push ke Git, minta file gambar secara terpisah dari pemilik project dan taruh manual di public/images/.
+## Catatan
 
-9. Jalankan Aplikasi
+- Docker Compose sudah menyediakan service `app` dan `db`.
+- `app` akan menjalankan `php artisan serve --host=0.0.0.0 --port=8000`.
+- Jika butuh melihat log, gunakan:
 
-Buka 2 terminal terpisah:
+```bash
+docker compose logs -f
+```
 
-Terminal 1 — Server Laravel:
+- Untuk menghentikan dan menghapus container:
 
-bash
-php artisan serve
+```bash
+docker compose down
+```
 
-Terminal 2 — Compile asset (wajib tetap berjalan selama development):
-
-bash
-npm run dev
-10. Akses Aplikasi
-Halaman	URL
-Halaman Awal (Kiosk)	http://127.0.0.1:8000
-Form Buku Tamu	http://127.0.0.1:8000/buku-tamu
-Login Admin	http://127.0.0.1:8000/login
-Dashboard	http://127.0.0.1:8000/dashboard
-
-Akun default:
-
-Email: admin@arpusjateng.go.id
-Password: password123
