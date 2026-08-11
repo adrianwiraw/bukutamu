@@ -29,19 +29,19 @@ DB_PASSWORD=secret
 4. Jalankan Docker Compose:
 
 ```bash
-docker compose up --build -d
+docker-compose up --build -d
 ```
 
 5. Jalankan seeder database:
 
 ```bash
-docker compose exec app php artisan db:seed
+docker-compose exec app php artisan db:seed
 ```
 
 6. Jalankan generate key:
 
 ```bash
-docker compose exec app php artisan key:generate
+docker-compose exec app php artisan key:generate
 ```
 
 7. Matikan container docker:
@@ -74,12 +74,12 @@ Setelah container berjalan, buka aplikasi di:
 - Jika butuh melihat log, gunakan:
 
 ```bash
-docker compose logs -f
+docker-compose logs -f
 ```
 
 - Untuk menghentikan dan menghapus container:
 
 ```bash
-docker compose down
+docker-compose down
 ```
 
