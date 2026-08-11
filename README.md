@@ -32,16 +32,28 @@ DB_PASSWORD=secret
 docker compose up --build -d
 ```
 
-5. Jalankan migrasi database:
-
-```bash
-docker compose exec app php artisan migrate
-```
-
-6. Jalankan seeder untuk membuat akun admin default:
+5. Jalankan seeder database:
 
 ```bash
 docker compose exec app php artisan db:seed
+```
+
+6. Jalankan generate key:
+
+```bash
+docker compose exec app php artisan key:generate
+```
+
+7. Matikan container docker:
+
+```bash
+docker-compose down
+```
+
+8. Nyalakan ulang container docker:
+
+```bash
+docker-compose up -d
 ```
 
 Admin default akan dibuat dari nilai `ADMIN_NAME`, `ADMIN_EMAIL`, dan `ADMIN_PASSWORD` di file `.env`.
