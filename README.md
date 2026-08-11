@@ -38,23 +38,13 @@ docker compose up --build -d
 docker compose exec app php artisan migrate
 ```
 
-6. Buat akun admin (Opsional):
+6. Jalankan seeder untuk membuat akun admin default:
 
 ```bash
-docker compose exec app php artisan tinker
+docker compose exec app php artisan db:seed
 ```
 
-Kemudian di dalam tinker:
-
-```php
-\App\Models\User::create([
-    'name' => 'Admin',
-    'email' => 'admin@arpusjateng.go.id',
-    'password' => bcrypt('password123'),
-]);
-```
-
-Ketik `exit` untuk keluar dari tinker.
+Admin default akan dibuat dari nilai `ADMIN_NAME`, `ADMIN_EMAIL`, dan `ADMIN_PASSWORD` di file `.env`.
 
 ## Akses Aplikasi
 

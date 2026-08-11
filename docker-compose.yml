@@ -5,18 +5,24 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+      - "5173:5173" # 👈 Buka Port untuk Vite
     env_file:
       - .env
+    volumes:
+      - .:/var/www/html
+      - /var/www/html/vendor
+      - /var/www/html/node_modules # 👈 Isolasi folder node_modules biar gak bentrok dengan Windows
     environment:
       ADMIN_NAME: ${ADMIN_NAME:-Admin}
-      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@admin.com}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@arpusjateng.go.id}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-secret123}
       ADMIN_GROUP_NAME: ${ADMIN_GROUP_NAME:-Super Admin}
       ADMIN_GROUP_AKSES_PENUH: ${ADMIN_GROUP_AKSES_PENUH:-1}
     depends_on:
       - db
     working_dir: /var/www/html
-    command: php artisan serve --host=0.0.0.0 --port=8000 --no-reload
+    # 👇 Ubah command agar menjalankan Laravel SERTA Vite sekaligus saat startup
+    command: sh -c "npm install && (npm run dev -- --host &) && php artisan serve --host=0.0.0.0 --port=8000 --no-reload"
 
   db:
     image: mysql:8.0
