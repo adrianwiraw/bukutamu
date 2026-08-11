@@ -5,13 +5,13 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
-      - "5173:5173" # 👈 Buka Port untuk Vite
+      - "5173:5173" # Buka Port untuk Vite
     env_file:
       - .env
     volumes:
       - .:/var/www/html
       - /var/www/html/vendor
-      - /var/www/html/node_modules # 👈 Isolasi folder node_modules biar gak bentrok dengan Windows
+      - /var/www/html/node_modules # Isolasi folder node_modules agar tidak bentrok dengan Windows
     environment:
       ADMIN_NAME: ${ADMIN_NAME:-Admin}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@arpusjateng.go.id}
@@ -21,8 +21,13 @@ services:
     depends_on:
       - db
     working_dir: /var/www/html
-    # 👇 Ubah command agar menjalankan Laravel SERTA Vite sekaligus saat startup
-    command: sh -c "npm install && (npm run dev -- --host &) && php artisan serve --host=0.0.0.0 --port=8000 --no-reload"
+    # Menggunakan tanda '|' agar perintah panjang ini rapi, mudah dibaca, dan aman dari eror spasi
+    command: |
+      sh -c "npm install && \
+      (npm run dev -- --host &) && \
+      if [ -z \"\$(grep APP_KEY .env | cut -d= -f2)\" ]; then php artisan key:generate --no-interaction; fi && \
+      php artisan config:clear && \
+      php artisan serve --host=0.0.0.0 --port=8000 --no-reload"
 
   db:
     image: mysql:8.0
