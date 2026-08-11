@@ -38,10 +38,10 @@ docker-compose up --build -d
 docker-compose exec app php artisan db:seed
 ```
 
-6. Jalankan generate key:
+6. Jalankan generate key dan clear cache:
 
 ```bash
-docker-compose exec app php artisan key:generate
+docker-compose exec app php artisan key:generate && docker-compose exec app php artisan config:clear
 ```
 
 7. Matikan container docker:
