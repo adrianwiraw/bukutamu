@@ -9,11 +9,24 @@ use Illuminate\Support\Carbon;
 
 class LaporanController extends Controller
 {
+    private const PDF_COLUMNS = [
+        'nama' => 'Nama',
+        'jenis_kelamin' => 'Jenis Kelamin',
+        'identitas' => 'Identitas',
+        'instansi_alamat' => 'Instansi/Alamat',
+        'keperluan' => 'Keperluan',
+        'pegawai_temui' => 'Pegawai yang Ditemui',
+        'jumlah' => 'Jumlah',
+        'usia' => 'Usia',
+        'tanggal' => 'Tanggal',
+        'waktu' => 'Waktu',
+    ];
+
     public function harian(Request $request)
     {
         $tanggal = $request->input('tanggal', now()->format('Y-m-d'));
 
-        $dataTamu = BukuTamu::whereDate('created_at', $tanggal)
+        $dataTamu = BukuTamu::whereDate('created', $tanggal)
             ->latest()
             ->paginate(10)
             ->withQueryString();
@@ -26,8 +39,8 @@ class LaporanController extends Controller
         $tahun = $request->input('tahun', now()->year);
         $bulan = $request->input('bulan', now()->month);
 
-        $dataTamu = BukuTamu::whereYear('created_at', $tahun)
-            ->whereMonth('created_at', $bulan)
+        $dataTamu = BukuTamu::whereYear('created', $tahun)
+            ->whereMonth('created', $bulan)
             ->latest()
             ->paginate(10)
             ->withQueryString();
@@ -41,7 +54,7 @@ class LaporanController extends Controller
     {
         $tahun = $request->input('tahun', now()->year);
 
-        $dataTamu = BukuTamu::whereYear('created_at', $tahun)
+        $dataTamu = BukuTamu::whereYear('created', $tahun)
             ->latest()
             ->paginate(10)
             ->withQueryString();
@@ -54,7 +67,7 @@ class LaporanController extends Controller
     public function custom(Request $request)
     {
         $tahun = $request->input('tahun', now()->year);
-        $dataTamu = BukuTamu::whereYear('created_at', $tahun)
+        $dataTamu = BukuTamu::whereYear('created', $tahun)
             ->latest()
             ->paginate(10)
             ->withQueryString();
@@ -67,7 +80,10 @@ class LaporanController extends Controller
     public function harianPdf(Request $request)
     {
         $tanggal = $request->input('tanggal', now()->format('Y-m-d'));
-        $dataTamu = BukuTamu::whereDate('created_at', $tanggal)
+        $table = $request->string('table', 'all')->toString();
+        abort_unless(in_array($table, ['all', 'detail'], true), 404);
+        $columns = $this->selectedPdfColumns($request);
+        $dataTamu = BukuTamu::whereDate('created', $tanggal)
             ->latest()
             ->get();
 
@@ -76,6 +92,8 @@ class LaporanController extends Controller
             'reportTitle' => 'Laporan Harian',
             'periodLabel' => Carbon::parse($tanggal)->format('d F Y'),
             'summary' => $this->pdfSummary($dataTamu),
+            'table' => $table,
+            'columns' => $columns,
         ], "laporan-harian-{$tanggal}.pdf", 'portrait');
     }
 
@@ -83,8 +101,11 @@ class LaporanController extends Controller
     {
         $tahun = $request->input('tahun', now()->year);
         $bulan = $request->input('bulan', now()->month);
-        $dataTamu = BukuTamu::whereYear('created_at', $tahun)
-            ->whereMonth('created_at', $bulan)
+        $table = $request->string('table', 'all')->toString();
+        abort_unless(in_array($table, ['all', 'detail'], true), 404);
+        $columns = $this->selectedPdfColumns($request);
+        $dataTamu = BukuTamu::whereYear('created', $tahun)
+            ->whereMonth('created', $bulan)
             ->latest()
             ->get();
 
@@ -93,13 +114,18 @@ class LaporanController extends Controller
             'reportTitle' => 'Laporan Bulanan',
             'periodLabel' => Carbon::createFromDate($tahun, $bulan, 1)->format('F Y'),
             'summary' => $this->pdfSummary($dataTamu),
+            'table' => $table,
+            'columns' => $columns,
         ], "laporan-bulanan-{$tahun}-{$bulan}.pdf", 'portrait');
     }
 
     public function tahunanPdf(Request $request)
     {
         $tahun = $request->input('tahun', now()->year);
-        $dataTamu = BukuTamu::whereYear('created_at', $tahun)
+        $table = $request->string('table', 'all')->toString();
+        abort_unless(in_array($table, ['all', 'detail'], true), 404);
+        $columns = $this->selectedPdfColumns($request);
+        $dataTamu = BukuTamu::whereYear('created', $tahun)
             ->latest()
             ->get();
 
@@ -108,13 +134,15 @@ class LaporanController extends Controller
             'reportTitle' => 'Laporan Tahunan',
             'periodLabel' => $tahun,
             'summary' => $this->pdfSummary($dataTamu),
+            'table' => $table,
+            'columns' => $columns,
         ], "laporan-tahunan-{$tahun}.pdf", 'portrait');
     }
 
     public function customPdf(Request $request)
     {
         $tahun = $request->input('tahun', now()->year);
-        $dataTamu = BukuTamu::whereYear('created_at', $tahun)
+        $dataTamu = BukuTamu::whereYear('created', $tahun)
             ->latest()
             ->get();
 
@@ -160,7 +188,7 @@ class LaporanController extends Controller
         }
 
         foreach ($dataTamu as $tamu) {
-            $month = $tamu->created_at->month;
+            $month = $tamu->created->month;
             $count = $tamu->anda_sendirian === 'Rombongan' ? ($tamu->jumlah_rombongan ?? 0) : 1;
             $categoryKey = 'Umum atau Lain - Lain';
 
@@ -189,14 +217,34 @@ class LaporanController extends Controller
 
     private function generatePdf(string $view, array $data, string $filename, string $orientation = 'portrait')
     {
+        ini_set('memory_limit', env('PDF_MEMORY_LIMIT', '512M'));
+
         $pdf = Pdf::loadView($view, $data)->setPaper('a4', $orientation);
 
         return $pdf->stream($filename);
     }
 
+    private function selectedPdfColumns(Request $request): array
+    {
+        $selected = $request->input('columns');
+
+        if (! is_array($selected)) {
+            return array_keys(self::PDF_COLUMNS);
+        }
+
+        $selected = array_values(array_intersect($selected, array_keys(self::PDF_COLUMNS)));
+
+        return $selected ?: array_keys(self::PDF_COLUMNS);
+    }
+
+    public static function pdfColumnLabels(): array
+    {
+        return self::PDF_COLUMNS;
+    }
+
     private function tahunTersedia()
     {
-        $tahunTersedia = BukuTamu::pluck('created_at')
+        $tahunTersedia = BukuTamu::pluck('created')
             ->map(fn ($tanggal) => Carbon::parse($tanggal)->year)
             ->unique()
             ->sortDesc()

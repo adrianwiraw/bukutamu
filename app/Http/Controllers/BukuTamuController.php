@@ -11,8 +11,9 @@ class BukuTamuController extends Controller
 {
     public function create()
     {
-        $keperluans = Keperluan::orderBy('nama')->get();
-    return view('bukutamu.welcome.create', compact('keperluans'));
+        $keperluans = Keperluan::orderBy('keperluan')->get();
+
+        return view('bukutamu.welcome.create', compact('keperluans'));
     }
 
     public function store(Request $request)
@@ -30,7 +31,7 @@ class BukuTamuController extends Controller
             'usia' => 'required|integer|min:1',
         ]);
 
-        $bukuTamu = BukuTamu::create($validated);
+        $bukuTamu = BukuTamu::createFromForm($validated);
 
         $feedbackRating = $request->input('feedback_rating');
         $feedbackMessage = $request->input('feedback_message');

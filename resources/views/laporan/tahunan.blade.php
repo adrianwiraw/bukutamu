@@ -27,12 +27,11 @@
                     <button class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold text-sm px-4 py-2 rounded-lg">
                         Tampilkan
                     </button>
-                    <a href="{{ route('laporan.tahunan.pdf', ['tahun' => $tahun]) }}"
-                       target="_blank"
-                       rel="noreferrer noopener"
-                       class="bg-gray-800 hover:bg-gray-900 text-white font-semibold text-sm px-4 py-2 rounded-lg">
-                        Export PDF
-                    </a>
+                    @include('laporan._export-menu', [
+                        'routeName' => 'laporan.tahunan.pdf',
+                        'routeParams' => ['tahun' => $tahun],
+                        'pdfColumns' => \App\Http\Controllers\LaporanController::pdfColumnLabels(),
+                    ])
                 </form>
 
                 @include('laporan._tabel')

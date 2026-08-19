@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $reportTitle }}</title>
+    @php $columnLabels = \App\Http\Controllers\LaporanController::pdfColumnLabels(); @endphp
     <style>
         body { font-family: DejaVu Sans, sans-serif; color: #333; margin: 0; padding: 0; }
         .page { width: 100%; margin: 0 auto; padding: 8px 10px; }
@@ -30,6 +31,7 @@
             <p>{{ $reportTitle }} - {{ $periodLabel }}</p>
         </div>
 
+        @if ($table === 'all')
         <div class="info">
             <div class="left">
                 <strong>Periode:</strong> {{ $periodLabel }}<br>
@@ -42,6 +44,7 @@
                 <strong>Perempuan:</strong> {{ $summary['totalPerempuan'] }}
             </div>
         </div>
+        @endif
 
         @if ($dataTamu->isEmpty())
             <div class="no-data">Tidak ada data pengunjung pada periode ini.</div>
@@ -50,24 +53,28 @@
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>Tanggal</th>
-                        <th>Waktu</th>
-                        <th>Kegiatan</th>
-                        <th>Asal</th>
-                        <th>Menemui</th>
-                        <th>Usia</th>
+                        @foreach ($columns as $column)
+                            <th>{{ $columnLabels[$column] }}</th>
+                        @endforeach
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($dataTamu as $index => $tamu)
                         <tr>
                             <td>{{ $index + 1 }}</td>
-                            <td>{{ $tamu->created_at->format('d F Y') }}</td>
-                            <td>{{ $tamu->created_at->format('H:i:s') }}</td>
-                            <td>{{ $tamu->keperluan }}</td>
-                            <td>{{ $tamu->instansi_alamat }}</td>
-                            <td>{{ $tamu->pegawai_temui ?? '-' }}</td>
-                            <td>{{ $tamu->usia ?? '-' }}</td>
+                            @foreach ($columns as $column)
+                                <td>
+                                    @if ($column === 'jumlah')
+                                        {{ $tamu->anda_sendirian === 'Rombongan' ? ($tamu->jumlah_rombongan ?? '-') . ' Orang' : '1 Orang' }}
+                                    @elseif ($column === 'tanggal')
+                                        {{ $tamu->created?->format('d F Y') ?? '-' }}
+                                    @elseif ($column === 'waktu')
+                                        {{ $tamu->created?->format('H:i:s') ?? '-' }}
+                                    @else
+                                        {{ $tamu->{$column} ?? '-' }}
+                                    @endif
+                                </td>
+                            @endforeach
                         </tr>
                     @endforeach
                 </tbody>

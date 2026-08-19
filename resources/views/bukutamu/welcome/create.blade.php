@@ -328,7 +328,7 @@
 
     <!-- Tombol Back -->
     <a href="{{ route('welcome') }}"
-        class="back-enter fixed top-14 left-4 z-50 flex items-center gap-3 bg-white/90 hover:bg-white text-gray-900 font-bold text-lg px-6 py-3 rounded-xl shadow-lg transition">
+        class="back-enter fixed top-20 left-4 z-50 flex items-center gap-3 bg-white/90 hover:bg-white text-gray-900 font-bold text-lg px-6 py-3 rounded-xl shadow-lg transition">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
             stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
@@ -367,12 +367,12 @@
 
                     <!-- IDENTITAS -->
                     <div class="field-enter" style="animation-delay:.55s">
-                        <label class="block text-sm md:text-base font-semibold text-gray-700">
+                        <label class="block text-sm md:text-base font-semibold text-gray-700 mb-1 px-4 py-2">
                             IDENTITAS <span class="font-normal italic text-red-600">(Wajib Diisi)</span>
                         </label>
                         <input type="text" name="identitas" required inputmode="none" pattern="[0-9]*" maxlength="20"
                             placeholder="Kartu Tanda Penduduk / SIM / Kartu Pelajar"
-                            class="bg-white kb-input-numeric w-full border border-gray-300 rounded-md px-4 p-2 text-lg focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                            class="bg-white kb-input kb-input-numeric w-full border border-gray-300 rounded-md px-4 p-2 text-lg focus:outline-none focus:ring-2 focus:ring-yellow-400">
                     </div>
 
                     <!-- NOMOR HP -->

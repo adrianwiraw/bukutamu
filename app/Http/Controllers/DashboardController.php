@@ -14,7 +14,7 @@ class DashboardController extends Controller
         $tahunSekarang = now()->year;
         $bulanSekarang = now()->month;
 
-        $tahunTersedia = BukuTamu::pluck('created_at')
+        $tahunTersedia = BukuTamu::pluck('created')
             ->map(fn ($tanggal) => Carbon::parse($tanggal)->year)
             ->unique()
             ->sortDesc()
@@ -71,10 +71,10 @@ class DashboardController extends Controller
         $namaBulan = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
         $data = array_fill(0, 12, 0);
 
-        BukuTamu::whereYear('created_at', $tahun)
-            ->get(['created_at'])
+        BukuTamu::whereYear('created', $tahun)
+            ->get(['created'])
             ->each(function ($item) use (&$data) {
-                $bulan = Carbon::parse($item->created_at)->month;
+                $bulan = Carbon::parse($item->created)->month;
                 $data[$bulan - 1]++;
             });
 
@@ -94,11 +94,11 @@ class DashboardController extends Controller
         $data = array_fill(0, $jumlahHari, 0);
         $labels = range(1, $jumlahHari);
 
-        BukuTamu::whereYear('created_at', $tahun)
-            ->whereMonth('created_at', $bulan)
-            ->get(['created_at'])
+        BukuTamu::whereYear('created', $tahun)
+            ->whereMonth('created', $bulan)
+            ->get(['created'])
             ->each(function ($item) use (&$data) {
-                $tanggal = Carbon::parse($item->created_at)->day;
+                $tanggal = Carbon::parse($item->created)->day;
                 $data[$tanggal - 1]++;
             });
 
@@ -114,14 +114,14 @@ class DashboardController extends Controller
         $tahun = (int) $request->input('tahun', now()->year);
         $bulan = $request->input('bulan');
 
-        $query = BukuTamu::whereYear('created_at', $tahun);
+        $query = BukuTamu::whereYear('created', $tahun);
 
         if ($bulan) {
-            $query->whereMonth('created_at', (int) $bulan);
+            $query->whereMonth('created', (int) $bulan);
         }
 
-        $hasil = $query->get(['keperluan'])
-            ->groupBy('keperluan')
+        $hasil = $query->get(['keperluan_pengunjung'])
+            ->groupBy('keperluan_pengunjung')
             ->map(fn ($grup) => $grup->count());
 
         return response()->json([

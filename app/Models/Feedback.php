@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Feedback extends Model
 {
+    protected $table = 'feedback';
+
     protected $fillable = [
         'buku_tamu_id',
         'rating',

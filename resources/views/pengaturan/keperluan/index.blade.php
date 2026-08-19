@@ -35,8 +35,8 @@
                             <td class="px-4 py-3 text-gray-500">{{ $keperluans->firstItem() + $index }}</td>
                             <td class="px-4 py-3 font-medium text-gray-900">{{ $item->nama }}</td>
                             <td class="px-4 py-3 flex gap-2">
-                                <a href="{{ route('keperluan.edit', $item->id) }}" class="text-blue-600 hover:underline text-xs font-medium">Edit</a>
-                                <form action="{{ route('keperluan.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Yakin hapus keperluan ini?')">
+                                <a href="{{ route('keperluan.edit', $item->getKey()) }}" class="text-blue-600 hover:underline text-xs font-medium">Edit</a>
+                                <form action="{{ route('keperluan.destroy', $item->getKey()) }}" method="POST" onsubmit="return confirm('Yakin hapus keperluan ini?')">
                                     @csrf @method('DELETE')
                                     <button class="text-red-600 hover:underline text-xs font-medium">Hapus</button>
                                 </form>

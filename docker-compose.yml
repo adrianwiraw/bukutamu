@@ -40,6 +40,7 @@ services:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
+      - "./database/bukutamu (1).sql:/docker-entrypoint-initdb.d/01-bukutamu.sql:ro"
 
 volumes:
   db_data:

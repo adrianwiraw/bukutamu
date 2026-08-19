@@ -10,7 +10,7 @@ class KeperluanController extends Controller
     public function index(Request $request)
     {
         $keperluans = Keperluan::when($request->cari, function ($q) use ($request) {
-                $q->where('nama', 'like', '%' . $request->cari . '%');
+                $q->where('keperluan', 'like', '%' . $request->cari . '%');
             })
             ->latest()
             ->paginate(10);

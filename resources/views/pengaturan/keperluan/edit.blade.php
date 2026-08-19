@@ -5,7 +5,7 @@
 
     <div class="p-8">
         <div class="bg-white rounded-xl border border-gray-200 p-6 max-w-xl">
-            <form action="{{ route('keperluan.update', $keperluan->id) }}" method="POST" class="space-y-4">
+            <form action="{{ route('keperluan.update', $keperluan->getKey()) }}" method="POST" class="space-y-4">
                 @csrf @method('PUT')
 
                 <div>

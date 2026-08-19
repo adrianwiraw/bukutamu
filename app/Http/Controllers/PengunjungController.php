@@ -14,10 +14,10 @@ class PengunjungController extends Controller
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('nama', 'like', "%{$search}%")
-                  ->orWhere('instansi_alamat', 'like', "%{$search}%")
-                  ->orWhere('keperluan', 'like', "%{$search}%")
-                  ->orWhere('no_hp', 'like', "%{$search}%");
+                                $q->where('nama_pengunjung', 'like', "%{$search}%")
+                                    ->orWhere('alamat_pengunjung', 'like', "%{$search}%")
+                                    ->orWhere('keperluan_pengunjung', 'like', "%{$search}%")
+                                    ->orWhere('nomortelepon', 'like', "%{$search}%");
             });
         }
 
