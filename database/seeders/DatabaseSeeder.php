@@ -28,29 +28,11 @@ class DatabaseSeeder extends Seeder
         );
 
         User::firstOrCreate(
-            ['email' => 'test@example.com'],
+            ['email' => 'admin@arpusjateng.go.id'],
             [
-                'name' => 'Test User',
-                'password' => 'password',
+                'name' => 'Admin',
+                'password' => 'secret123',
             ]
         );
-
-        User::firstOrCreate(
-            ['email' => env('ADMIN_EMAIL', 'admin@admin.com')],
-            [
-                'name' => env('ADMIN_NAME', 'Admin'),
-                'password' => env('ADMIN_PASSWORD', 'secret123'),
-                'group_id' => $adminGroup->id,
-                'email_verified_at' => now(),
-                'aktif' => 1,
-            ]
-        );
-
-        // Ensure existing admin user is assigned to the admin group
-        $admin = User::where('email', env('ADMIN_EMAIL', 'admin@admin.com'))->first();
-        if ($admin && (!$admin->group_id || $admin->group_id !== $adminGroup->id)) {
-            $admin->group_id = $adminGroup->id;
-            $admin->save();
-        }
     }
 }
