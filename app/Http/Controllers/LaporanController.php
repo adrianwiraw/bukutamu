@@ -111,7 +111,7 @@ class LaporanController extends Controller
 
         return $this->generatePdf('laporan.pdf-detail', [
             'dataTamu' => $dataTamu,
-            'reportTitle' => 'Laporan Bulanan',
+            'reportTitle' => 'Laporan Bulan',
             'periodLabel' => Carbon::createFromDate($tahun, $bulan, 1)->format('F Y'),
             'summary' => $this->pdfSummary($dataTamu),
             'table' => $table,
@@ -131,7 +131,7 @@ class LaporanController extends Controller
 
         return $this->generatePdf('laporan.pdf-detail', [
             'dataTamu' => $dataTamu,
-            'reportTitle' => 'Laporan Tahunan',
+            'reportTitle' => 'Laporan Tahun',
             'periodLabel' => $tahun,
             'summary' => $this->pdfSummary($dataTamu),
             'table' => $table,
@@ -148,7 +148,7 @@ class LaporanController extends Controller
 
         return $this->generatePdf('laporan.pdf-summary', [
             'dataTamu' => $dataTamu,
-            'reportTitle' => 'Laporan Custom',
+            'reportTitle' => 'Laporan Tahun',
             'periodLabel' => $tahun,
             'summary' => $this->pdfSummary($dataTamu),
             'summaryTable' => $this->prepareCustomSummary($dataTamu),
@@ -235,6 +235,98 @@ class LaporanController extends Controller
         $selected = array_values(array_intersect($selected, array_keys(self::PDF_COLUMNS)));
 
         return $selected ?: array_keys(self::PDF_COLUMNS);
+    }
+
+    public function harianExcel(Request $request)
+    {
+        $tanggal = $request->input('tanggal', now()->format('Y-m-d'));
+        $dataTamu = BukuTamu::whereDate('created', $tanggal)->latest()->get();
+
+        return $this->generateExcel('Laporan Harian', Carbon::parse($tanggal)->format('d F Y'), $dataTamu, "laporan-harian-{$tanggal}");
+    }
+
+    public function bulananExcel(Request $request)
+    {
+        $tahun = $request->input('tahun', now()->year);
+        $bulan = $request->input('bulan', now()->month);
+        $dataTamu = BukuTamu::whereYear('created', $tahun)
+            ->whereMonth('created', $bulan)
+            ->latest()
+            ->get();
+
+        $periodLabel = Carbon::createFromDate($tahun, $bulan, 1)->format('F Y');
+        return $this->generateExcel('Laporan Bulan', $periodLabel, $dataTamu, "laporan-bulanan-{$tahun}-{$bulan}");
+    }
+
+    public function tahunanExcel(Request $request)
+    {
+        $tahun = $request->input('tahun', now()->year);
+        $dataTamu = BukuTamu::whereYear('created', $tahun)->latest()->get();
+
+        return $this->generateExcel('Laporan Tahun', $tahun, $dataTamu, "laporan-tahunan-{$tahun}");
+    }
+
+    public function customExcel(Request $request)
+    {
+        $tahun = $request->input('tahun', now()->year);
+        $dataTamu = BukuTamu::whereYear('created', $tahun)->latest()->get();
+
+        return $this->generateExcel('Laporan Tahun', $tahun, $dataTamu, "laporan-custom-{$tahun}");
+    }
+
+    private function generateExcel(string $title, $period, $dataTamu, string $filename)
+    {
+        $csvContent = "DATA LAYANAN ARSIP\n";
+        $csvContent .= "DINAS KEARSIPAN DAN PERPUSTAKAAN PROVINSI JATENG\n";
+        $csvContent .= "$title - $period\n";
+        $csvContent .= "\n";
+        $csvContent .= "Tanggal Cetak," . now()->format('d F Y') . "\n";
+        $csvContent .= "\n";
+
+        // Header kolom
+        $headers = ['No', 'Nama', 'Jenis Kelamin', 'Identitas', 'Instansi/Alamat', 'Keperluan', 'Pegawai yang Ditemui', 'Jumlah', 'Usia', 'Tanggal', 'Waktu'];
+        $csvContent .= implode(',', $this->escapeCsv($headers)) . "\n";
+
+        // Data
+        foreach ($dataTamu as $index => $tamu) {
+            $row = [
+                $index + 1,
+                $tamu->nama_pengunjung ?? $tamu->nama ?? '-',
+                $tamu->jenis_kelamin ?? '-',
+                $tamu->identitas ?? '-',
+                $tamu->alamat_pengunjung ?? $tamu->instansi_alamat ?? '-',
+                $tamu->keperluan_pengunjung ?? $tamu->keperluan ?? '-',
+                $tamu->pejabat ?? $tamu->pegawai_temui ?? '-',
+                ($tamu->anda_sendirian === 'Rombongan' ? ($tamu->jumlah ?? '-') . ' Orang' : '1 Orang'),
+                $tamu->usia ?? '-',
+                optional($tamu->created)->format('d F Y') ?? '-',
+                optional($tamu->created)->format('H:i:s') ?? '-',
+            ];
+
+            $csvContent .= implode(',', $this->escapeCsv($row)) . "\n";
+        }
+
+        return response()->streamDownload(
+            fn () => print($csvContent),
+            $filename . '.csv',
+            [
+                'Content-Type' => 'text/csv; charset=utf-8',
+                'Content-Disposition' => "attachment; filename=\"{$filename}.csv\"",
+            ]
+        );
+    }
+
+    private function escapeCsv(array $row): array
+    {
+        return array_map(function ($cell) {
+            $cell = (string) ($cell ?? '');
+
+            // Escape double quotes and wrap in quotes if needed
+            if (strpos($cell, ',') !== false || strpos($cell, '"') !== false || strpos($cell, "\n") !== false) {
+                return '"' . str_replace('"', '""', $cell) . '"';
+            }
+            return $cell;
+        }, $row);
     }
 
     public static function pdfColumnLabels(): array

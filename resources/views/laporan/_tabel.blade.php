@@ -15,14 +15,14 @@
             @forelse ($dataTamu as $index => $tamu)
                 <tr class="hover:bg-yellow-50/50">
                     <td class="px-4 py-3 text-gray-500">{{ $dataTamu->firstItem() + $index }}</td>
-                    <td class="px-4 py-3 font-medium text-gray-900">{{ $tamu->nama }}</td>
-                    <td class="px-4 py-3 text-gray-600">{{ $tamu->instansi_alamat }}</td>
-                    <td class="px-4 py-3 text-gray-600">{{ $tamu->keperluan }}</td>
+                    <td class="px-4 py-3 font-medium text-gray-900">{{ $tamu->nama_pengunjung ?? $tamu->nama ?? '-' }}</td>
+                    <td class="px-4 py-3 text-gray-600">{{ $tamu->alamat_pengunjung ?? $tamu->instansi_alamat ?? '-' }}</td>
+                    <td class="px-4 py-3 text-gray-600">{{ $tamu->keperluan_pengunjung ?? $tamu->keperluan ?? '-' }}</td>
                     <td class="px-4 py-3 text-gray-600">
-                        {{ $tamu->anda_sendirian === 'Rombongan' ? ($tamu->jumlah_rombongan ?? '-') . ' Orang' : '1 Orang' }}
+                        {{ $tamu->anda_sendirian === 'Rombongan' ? ($tamu->jumlah ?? '-') . ' Orang' : '1 Orang' }}
                     </td>
-                    <td class="px-4 py-3 text-gray-500">{{ $tamu->created_at->format('d M Y') }}</td>
-                    <td class="px-4 py-3 text-gray-600">{{ $tamu->jenis_kelamin }}</td>
+                    <td class="px-4 py-3 text-gray-500">{{ optional($tamu->created)->format('d M Y') ?? '-' }}</td>
+                    <td class="px-4 py-3 text-gray-600">{{ $tamu->jenis_kelamin ?? '-' }}</td>
                 </tr>
             @empty
                 <tr>

@@ -1,11 +1,13 @@
 <details class="relative">
     <summary class="list-none cursor-pointer bg-gray-800 hover:bg-gray-900 text-white font-semibold text-sm px-4 py-2 rounded-lg">
-        Export PDF
+        Export
     </summary>
-    <div class="absolute right-0 z-10 mt-2 w-72 rounded-lg border border-gray-200 bg-white p-3 shadow-lg">
+    <div class="absolute right-0 z-50 mt-2 w-72 rounded-lg border border-gray-200 bg-white p-3 shadow-lg">
         <div class="space-y-3">
+            <!-- PDF Export Options - hanya tampil untuk laporan selain custom -->
+            @if (!isset($isCustom) || !$isCustom)
             <fieldset>
-                <legend class="mb-2 text-sm font-semibold text-gray-800">Kolom PDF</legend>
+                <legend class="mb-2 text-sm font-semibold text-gray-800">Export PDF - Pilih Kolom</legend>
                 <div class="grid grid-cols-2 gap-2">
                     @foreach ($pdfColumns as $column => $label)
                         <label class="flex items-center gap-2 text-xs text-gray-700">
@@ -28,10 +30,16 @@
                     Tabel data pengunjung saja
                 </label>
             </fieldset>
+            @endif
 
-            <button type="button" data-pdf-export class="w-full rounded-md bg-gray-800 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-900">
-                Buat PDF
-            </button>
+            <div class="flex gap-2">
+                <button type="button" data-pdf-export class="flex-1 rounded-md bg-yellow-500 hover:bg-yellow-600 px-3 py-2 text-sm font-semibold text-gray-900 transition">
+                    📄 PDF
+                </button>
+                <button type="button" data-excel-export data-excel-route="{{ $excelRouteName ?? '' }}" class="flex-1 rounded-md bg-green-600 hover:bg-green-700 px-3 py-2 text-sm font-semibold text-white transition">
+                    📊 Excel
+                </button>
+            </div>
         </div>
     </div>
 </details>
@@ -40,14 +48,48 @@
     document.querySelectorAll('[data-pdf-export]').forEach((button) => {
         button.addEventListener('click', () => {
             const menu = button.closest('details');
+            const form = button.closest('form');
             const url = new URL(@json(route($routeName, $routeParams)), window.location.origin);
             const columns = Array.from(menu.querySelectorAll('[data-pdf-column]:checked'))
                 .map((input) => input.dataset.pdfColumn);
-            const table = menu.querySelector('[name="pdf_table"]:checked').value;
+            const tableRadio = menu.querySelector('[name="pdf_table"]:checked');
+            const table = tableRadio ? tableRadio.value : 'all';
 
-            url.searchParams.set('table', table);
-            columns.forEach((column) => url.searchParams.append('columns[]', column));
+            if (form) {
+                new FormData(form).forEach((value, key) => url.searchParams.set(key, value));
+            }
+
+            if (columns.length > 0) {
+                url.searchParams.set('table', table);
+                columns.forEach((column) => url.searchParams.append('columns[]', column));
+            }
             window.open(url.toString(), '_blank', 'noopener,noreferrer');
+        });
+    });
+
+    document.querySelectorAll('[data-excel-export]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const excelRoute = button.getAttribute('data-excel-route');
+            if (!excelRoute) {
+                alert('Excel export tidak tersedia');
+                return;
+            }
+            const currentUrl = new URL(window.location.href);
+            const url = new URL(excelRoute, window.location.origin);
+            const form = button.closest('form');
+
+            if (form) {
+                new FormData(form).forEach((value, key) => url.searchParams.set(key, value));
+            }
+
+            // Preserve existing query parameters
+            currentUrl.searchParams.forEach((value, key) => {
+                if (!url.searchParams.has(key)) {
+                    url.searchParams.set(key, value);
+                }
+            });
+
+            window.location.href = url.toString();
         });
     });
 </script>

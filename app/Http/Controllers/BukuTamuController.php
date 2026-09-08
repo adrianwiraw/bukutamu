@@ -38,8 +38,8 @@ class BukuTamuController extends Controller
 
         if ($feedbackRating || $feedbackMessage) {
             Feedback::create([
-                'buku_tamu_id' => $bukuTamu->id,
-                'rating' => $feedbackRating ? (int) $feedbackRating : null,
+                'buku_tamu_id' => $bukuTamu->getKey(),
+                'rating' => $feedbackRating ? (int) $feedbackRating : 0,
                 'feedback' => $feedbackMessage,
                 'status' => 'baru',
             ]);
@@ -48,7 +48,7 @@ class BukuTamuController extends Controller
         return redirect()->route('bukutamu.create')
             ->with('success', 'Terima kasih, data berhasil disimpan!')
             ->with('showFeedbackModal', true)
-            ->with('latest_buku_tamu_id', $bukuTamu->id);
+            ->with('latest_buku_tamu_id', $bukuTamu->getKey());
     }
 
     public function storeFeedback(Request $request)
@@ -59,18 +59,19 @@ class BukuTamuController extends Controller
             return redirect()->route('bukutamu.create')->with('feedback_error', 'Sesi feedback tidak tersedia.');
         }
 
+        // Convert empty strings to null before validation
         $validated = $request->validate([
             'feedback_rating' => 'nullable|integer|min:1|max:5',
             'feedback_message' => 'nullable|string|max:1000',
         ]);
 
-        $feedbackRating = $validated['feedback_rating'] ?? null;
+        $feedbackRating = (int) ($validated['feedback_rating'] ?? 0);
         $feedbackMessage = $validated['feedback_message'] ?? null;
 
         if ($feedbackRating || $feedbackMessage) {
             Feedback::create([
                 'buku_tamu_id' => $bukuTamuId,
-                'rating' => $feedbackRating ? (int) $feedbackRating : null,
+                'rating' => $feedbackRating,
                 'feedback' => $feedbackMessage,
                 'status' => 'baru',
             ]);

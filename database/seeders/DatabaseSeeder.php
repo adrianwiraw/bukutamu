@@ -28,10 +28,12 @@ class DatabaseSeeder extends Seeder
         );
 
         User::firstOrCreate(
-            ['email' => 'admin@arpusjateng.go.id'],
+            ['email' => env('ADMIN_EMAIL', 'admin@arpusjateng.go.id')],
             [
-                'name' => 'Admin',
-                'password' => 'secret123',
+                'name' => env('ADMIN_NAME', 'Admin'),
+                'password' => env('ADMIN_PASSWORD', 'secret123'),
+                'group_id' => $adminGroup->id,
+                'aktif' => true,
             ]
         );
     }

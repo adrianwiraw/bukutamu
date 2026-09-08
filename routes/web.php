@@ -45,12 +45,16 @@ Route::middleware('auth')->group(function () {
     Route::delete('/pengunjung/{bukuTamu}', [PengunjungController::class, 'destroy'])->name('pengunjung.destroy');
     Route::get('/laporan/harian', [LaporanController::class, 'harian'])->name('laporan.harian');
     Route::get('/laporan/harian/pdf', [LaporanController::class, 'harianPdf'])->name('laporan.harian.pdf');
+    Route::get('/laporan/harian/excel', [LaporanController::class, 'harianExcel'])->name('laporan.harian.excel');
     Route::get('/laporan/bulanan', [LaporanController::class, 'bulanan'])->name('laporan.bulanan');
     Route::get('/laporan/bulanan/pdf', [LaporanController::class, 'bulananPdf'])->name('laporan.bulanan.pdf');
+    Route::get('/laporan/bulanan/excel', [LaporanController::class, 'bulananExcel'])->name('laporan.bulanan.excel');
     Route::get('/laporan/tahunan', [LaporanController::class, 'tahunan'])->name('laporan.tahunan');
     Route::get('/laporan/tahunan/pdf', [LaporanController::class, 'tahunanPdf'])->name('laporan.tahunan.pdf');
+    Route::get('/laporan/tahunan/excel', [LaporanController::class, 'tahunanExcel'])->name('laporan.tahunan.excel');
     Route::get('/laporan/custom', [LaporanController::class, 'custom'])->name('laporan.custom');
     Route::get('/laporan/custom/pdf', [LaporanController::class, 'customPdf'])->name('laporan.custom.pdf');
+    Route::get('/laporan/custom/excel', [LaporanController::class, 'customExcel'])->name('laporan.custom.excel');
 
 });
 

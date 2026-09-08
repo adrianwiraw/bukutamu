@@ -17,6 +17,6 @@ class Feedback extends Model
 
     public function bukuTamu()
     {
-        return $this->belongsTo(BukuTamu::class, 'buku_tamu_id');
+        return $this->belongsTo(BukuTamu::class, 'buku_tamu_id', 'id_pengunjung');
     }
 }

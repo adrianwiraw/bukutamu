@@ -1,13 +1,13 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800">Laporan Tahunan</h2>
+        <h2 class="font-semibold text-xl text-gray-800">Laporan Tahun</h2>
     </x-slot>
 
     <div class="p-8 space-y-4">
 
         <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
             <div class="bg-yellow-500 px-4 py-3">
-                <h3 class="font-semibold text-gray-900 text-sm">Laporan Tahunan</h3>
+                <h3 class="font-semibold text-gray-900 text-sm">Laporan Tahun</h3>
             </div>
 
             <div class="p-4 space-y-4">
@@ -30,6 +30,7 @@
                     @include('laporan._export-menu', [
                         'routeName' => 'laporan.tahunan.pdf',
                         'routeParams' => ['tahun' => $tahun],
+                        'excelRouteName' => route('laporan.tahunan.excel', ['tahun' => $tahun]),
                         'pdfColumns' => \App\Http\Controllers\LaporanController::pdfColumnLabels(),
                     ])
                 </form>

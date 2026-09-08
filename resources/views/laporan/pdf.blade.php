@@ -24,8 +24,8 @@
 <body>
     <div class="page">
         <div class="heading">
-            <h1>DATA LAYANAN</h1>
-            <p>DINAS KEARSIPAN DAN PERPUSTAKAAN PROV JATENG</p>
+            <h1>DATA LAYANAN ARSIP</h1>
+            <p>DINAS KEARSIPAN DAN PERPUSTAKAAN <br> PROVINSI JATENG</p>
             <p>{{ $reportTitle }} - {{ $periodLabel }}</p>
         </div>
 

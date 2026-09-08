@@ -14,23 +14,22 @@
         .info .left, .info .right { display: inline-block; vertical-align: top; }
         .info .left { width: 55%; }
         .info .right { width: 43%; text-align: right; }
-        table { width: 100%; border-collapse: collapse; font-size: 8px; }
+        table { width: 100%; border-collapse: collapse; font-size: 7px; table-layout: fixed; }
         table thead th, table tbody td { border: 1px solid #333; padding: 3px 2px; }
         table thead th { background: #f5f5f5; }
-        .month-cell { line-height: 1.1; }
-        .month-cell span { display: block; }
+        .number-cell { text-align: center; }
+        .activity-cell { line-height: 1.2; overflow-wrap: break-word; }
         .footer { margin-top: 10px; font-size: 9.5px; }
         .footer .signature { width: 220px; float: right; text-align: center; }
-        .bottom-summary { margin-top: 10px; font-size: 9px; }
-        .bottom-summary .box { display: inline-block; width: 24%; padding: 6px; border: 1px solid #333; background: #f6f6f6; box-sizing: border-box; margin-right: 1%; }
-        .bottom-summary .box:last-child { margin-right: 0; }
+        .bottom-summary { display: table; width: 100%; table-layout: fixed; margin-top: 10px; font-size: 9px; }
+        .bottom-summary .box { display: table-cell; width: 25%; padding: 6px; border: 1px solid #333; background: #f6f6f6; }
     </style>
 </head>
 <body>
     <div class="page">
         <div class="heading">
-            <h1>DATA LAYANAN</h1>
-            <p>DINAS KEARSIPAN DAN PERPUSTAKAAN PROV. JATENG</p>
+            <h1>DATA LAYANAN ARSIP</h1>
+            <p>DINAS KEARSIPAN DAN PERPUSTAKAAN <br> PROVINSI JATENG</p>
             <p>{{ $reportTitle }} - {{ $periodLabel }}</p>
         </div>
 
@@ -48,16 +47,31 @@
         </div>
 
         <table>
+            <colgroup>
+                <col style="width: 3%;">
+                <col style="width: 24%;">
+                @for ($column = 1; $column <= 24; $column++)
+                    <col style="width: 2.7%;">
+                @endfor
+                <col style="width: 4%;">
+                <col style="width: 4%;">
+            </colgroup>
             <thead>
                 <tr>
-                    <th rowspan="2">No</th>
-                    <th rowspan="2">Kegiatan</th>
-                    <th colspan="12">Bulan</th>
+                    <th rowspan="3">No</th>
+                    <th rowspan="3">Kegiatan</th>
+                    <th colspan="24">Bulan</th>
                     <th colspan="2">Jumlah</th>
                 </tr>
                 <tr>
                     @foreach (['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agt','Sep','Okt','Nov','Des'] as $month)
-                        <th>{{ $month }}</th>
+                        <th colspan="2">{{ $month }}</th>
+                    @endforeach
+                </tr>
+                <tr>
+                    @foreach (range(1, 12) as $month)
+                        <th>KL</th>
+                        <th>Org</th>
                     @endforeach
                     <th>KL</th>
                     <th>Org</th>
@@ -68,20 +82,22 @@
                 @foreach ($summaryTable['summary'] as $category => $months)
                     <tr>
                         <td>{{ $row++ }}</td>
-                        <td>{{ $category }}</td>
+                        <td class="activity-cell">{{ $category }}</td>
                         @php $rowTotalKl = 0; $rowTotalOrg = 0; @endphp
                         @foreach ($months as $month => $values)
                             @php $rowTotalKl += $values['kl']; $rowTotalOrg += $values['org']; @endphp
-                            <td class="month-cell"><span>{{ $values['kl'] }} KL</span><span>{{ $values['org'] }} Org</span></td>
+                            <td class="number-cell">{{ $values['kl'] }}</td>
+                            <td class="number-cell">{{ $values['org'] }}</td>
                         @endforeach
-                        <td>{{ $rowTotalKl }}</td>
-                        <td>{{ $rowTotalOrg }}</td>
+                        <td class="number-cell">{{ $rowTotalKl }}</td>
+                        <td class="number-cell">{{ $rowTotalOrg }}</td>
                     </tr>
                 @endforeach
                 <tr>
                     <td colspan="2"><strong>Jumlah Total</strong></td>
                     @foreach ($summaryTable['totals'] as $month => $values)
-                        <td class="month-cell"><span><strong>{{ $values['kl'] }}</strong> KL</span><span><strong>{{ $values['org'] }}</strong> Org</span></td>
+                        <td class="number-cell"><strong>{{ $values['kl'] }}</strong></td>
+                        <td class="number-cell"><strong>{{ $values['org'] }}</strong></td>
                     @endforeach
                     @php
                         $totalKl = collect($summaryTable['totals'])->sum(fn($value) => $value['kl']);

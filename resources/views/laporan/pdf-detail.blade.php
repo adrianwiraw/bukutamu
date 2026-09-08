@@ -26,8 +26,8 @@
 <body>
     <div class="page">
         <div class="heading">
-            <h1>DATA LAYANAN</h1>
-            <p>DINAS KEARSIPAN DAN PERPUSTAKAAN PROV. JATENG</p>
+            <h1>DATA LAYANAN ARSIP</h1>
+            <p>DINAS KEARSIPAN DAN PERPUSTAKAAN <br> PROVINSI JATENG</p>
             <p>{{ $reportTitle }} - {{ $periodLabel }}</p>
         </div>
 
@@ -64,12 +64,26 @@
                             <td>{{ $index + 1 }}</td>
                             @foreach ($columns as $column)
                                 <td>
-                                    @if ($column === 'jumlah')
-                                        {{ $tamu->anda_sendirian === 'Rombongan' ? ($tamu->jumlah_rombongan ?? '-') . ' Orang' : '1 Orang' }}
+                                    @if ($column === 'nama')
+                                        {{ $tamu->nama_pengunjung ?? $tamu->nama ?? '-' }}
+                                    @elseif ($column === 'jenis_kelamin')
+                                        {{ $tamu->jenis_kelamin ?? '-' }}
+                                    @elseif ($column === 'identitas')
+                                        {{ $tamu->identitas ?? '-' }}
+                                    @elseif ($column === 'instansi_alamat')
+                                        {{ $tamu->alamat_pengunjung ?? $tamu->instansi_alamat ?? '-' }}
+                                    @elseif ($column === 'keperluan')
+                                        {{ $tamu->keperluan_pengunjung ?? $tamu->keperluan ?? '-' }}
+                                    @elseif ($column === 'pegawai_temui')
+                                        {{ $tamu->pejabat ?? $tamu->pegawai_temui ?? '-' }}
+                                    @elseif ($column === 'jumlah')
+                                        {{ $tamu->anda_sendirian === 'Rombongan' ? ($tamu->jumlah ?? '-') . ' Orang' : '1 Orang' }}
+                                    @elseif ($column === 'usia')
+                                        {{ $tamu->usia ?? '-' }}
                                     @elseif ($column === 'tanggal')
-                                        {{ $tamu->created?->format('d F Y') ?? '-' }}
+                                        {{ optional($tamu->created)->format('d F Y') ?? '-' }}
                                     @elseif ($column === 'waktu')
-                                        {{ $tamu->created?->format('H:i:s') ?? '-' }}
+                                        {{ optional($tamu->created)->format('H:i:s') ?? '-' }}
                                     @else
                                         {{ $tamu->{$column} ?? '-' }}
                                     @endif

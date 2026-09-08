@@ -13,7 +13,11 @@ return new class extends Migration
     {
         Schema::create('feedback', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('buku_tamu_id')->constrained()->cascadeOnDelete();
+            $table->unsignedInteger('buku_tamu_id');
+            $table->foreign('buku_tamu_id')
+                ->references('id_pengunjung')
+                ->on('pengunjung')
+                ->cascadeOnDelete();
             $table->tinyInteger('rating')->unsigned()->default(0);
             $table->text('feedback')->nullable();
             $table->string('status')->default('baru');
