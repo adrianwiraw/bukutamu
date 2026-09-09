@@ -10,14 +10,16 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        // 1. Buat tabel groups terlebih dahulu agar users tidak error!
+        // 1. Buat tabel groups dengan kolom yang SESUAI dengan Model Group
         Schema::create('groups', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->nullable(); // sesuaikan jika ada kolom lain
+            $table->string('nama')->nullable();       // Diubah dari 'name' menjadi 'nama'
+            $table->text('deskripsi')->nullable();    // Ditambahkan agar sesuai model
+            $table->boolean('akses_penuh')->default(false); // Ditambahkan agar sesuai model
             $table->timestamps();
         });
 
-        // 2. Buat tabel permissions bawaan file ini
+        // 2. Buat tabel permissions
         Schema::create('permissions', function (Blueprint $table) {
             $table->id();
             $table->string('nama');

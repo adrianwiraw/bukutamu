@@ -5,13 +5,13 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
-      - "5173:5173" # Buka Port untuk Vite
+      - "5173:5173"
     env_file:
       - .env
     volumes:
       - .:/var/www/html
       - /var/www/html/vendor
-      - /var/www/html/node_modules # Isolasi folder node_modules agar tidak bentrok dengan Windows
+      - /var/www/html/node_modules
     environment:
       ADMIN_NAME: ${ADMIN_NAME:-Admin}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@arpusjateng.go.id}
@@ -19,15 +19,17 @@ services:
       ADMIN_GROUP_NAME: ${ADMIN_GROUP_NAME:-Super Admin}
       ADMIN_GROUP_AKSES_PENUH: ${ADMIN_GROUP_AKSES_PENUH:-1}
     depends_on:
-      - db
+      db:
+        condition: service_healthy # 👈 Tunggu MySQL benar-benar siap
     working_dir: /var/www/html
-    # Menggunakan tanda '|' agar perintah panjang ini rapi, mudah dibaca, dan aman dari eror spasi
-    command: |
-      sh -c "npm install && \
-      (npm run dev -- --host &) && \
-      if [ -z \"\$(grep APP_KEY .env | cut -d= -f2)\" ]; then php artisan key:generate --no-interaction; fi && \
-      php artisan config:clear && \
-      php artisan serve --host=0.0.0.0 --port=8000 --no-reload"
+    # 👈 Hapus migrate dari sini, biarkan container hanya fokus menyalakan server
+    command: >
+      sh -c "
+        chmod -R 775 storage bootstrap/cache &&
+        (npm run dev -- --host > /dev/null 2>&1 &) &&
+        php artisan config:clear &&
+        php artisan serve --host=0.0.0.0 --port=8000
+      "
 
   db:
     image: mysql:8.0
@@ -40,7 +42,14 @@ services:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
+      # Pastikan file ini ada, jika tidak, hapus baris di bawah ini:
       - "./database/bukutamu (1).sql:/docker-entrypoint-initdb.d/01-bukutamu.sql:ro"
+    # 👈 Tambahkan healthcheck agar Docker tahu kapan MySQL siap
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "laravel", "-psecret"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 volumes:
   db_data:

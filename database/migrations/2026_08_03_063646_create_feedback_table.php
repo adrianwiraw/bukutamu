@@ -6,17 +6,14 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('feedback', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('buku_tamu_id');
+            $table->unsignedBigInteger('buku_tamu_id');
             $table->foreign('buku_tamu_id')
-                ->references('id_pengunjung')
-                ->on('pengunjung')
+                ->references('id_pengunjung') // Primary key di tabel pengunjung
+                ->on('pengunjung')            // Nama tabel yang benar
                 ->cascadeOnDelete();
             $table->tinyInteger('rating')->unsigned()->default(0);
             $table->text('feedback')->nullable();
@@ -25,9 +22,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('feedback');
